@@ -1,0 +1,160 @@
+ArrayList
+`````````
+1. A resizable array from java.util package that grows automatically when a new element is added.
+2. It implements List interface.
+3. Allows duplicate elements and maintains insertion order.
+4. Not synchronized, not thread safe.
+5. Fast element retrieval, O(n)
+6. Slower insertion/deletion as shifting of elements has to happen except at the end.
+7. initially the size will be zero, when the first element is added it increases to 10.
+8. When the arraylist is full, it creates a new array with size usually 1.5x and copies all the elements to it.
+
+-> Sorting arraylist elements: Collections.sort(list)
+-> Add the elements at the end: list.add("Demon")
+-> Add an element at a specific position: list.add(1, "Simon")
+-> Add one list to another list's end: list.addAll(list2)
+-> Remove an element from the end: list.remove()
+-> Remove an element from a specified location: list.remove(1);
+-> Remove based on condition: list.removeIf(str -> str.contains("Demon")), uses lambda function.
+-> Remove all elements from array list, list.clear();
+
+Note -> The size of the arraylist means the total number of elements the list has currently and capacity means the maximum no.of elements it can allow.
+
+Advantages:
+1. Dynamic Sizing – Automatically grows/shrinks when elements are added/removed.
+2. Random Access – O(1) time to get element by index.
+3. Fast Iteration – Easy traversal using loops or iterators.
+4. Versatility – Can store any object type (including user-defined classes).
+5. Flexibility – Many built-in methods for add, remove, update, etc.
+6. Generics Support – Type-safe; avoids runtime type errors.
+7. Integration – Part of Java Collections Framework; works well with other collection utilities.
+
+Disadvantages:
+1. Resizing Overhead – Growing/shrinking involves copying elements → performance cost.
+2. Memory Wastage – May allocate more capacity than needed.
+3. Slow Insert/Delete (Middle) – Requires shifting elements.
+4. No Primitives Directly – Must use wrapper classes (causes boxing/unboxing overhead).
+5. Not Thread-Safe – Requires manual synchronization for multi-threaded use.
+   Synchronization can be achieved using synchronization blocks or using Vector or CopyOnWriteArrayList as thread-safe alternatives.
+6. Limited Performance for Large Data – LinkedList or HashSet may be better for certain operations.
+
+Linked List
+```````````
+1. Uses doubly linked list for storing elements.
+2. Implements List & Deque interfaces, inherits: AbstractList.
+3. Stores elements as nodes (data + reference to previous & next node).
+4. Duplicates Allowed – Can store repeated elements.
+5. Maintains Insertion Order – Elements remain in the order they were added.
+6. Non-Synchronized – Not thread-safe; needs manual synchronization in multi-threaded use.
+7. Fast Manipulation – Insertion/deletion is efficient (no shifting like arrays).
+8. Multiple Roles – Can act as List, Stack, or Queue.
+9. Dynamic Size – Grows/shrinks automatically without resizing arrays.
+10. Efficient for Frequent Insert/Delete – Especially in middle of the list.
+11. Slower Random Access – Accessing element by index requires traversal (O(n) time).
+
+Hash Set
+````````
+1. Hash Set internally uses hashing mechanism to store the elements.
+2. It stores only unique elements and allows one null value.
+3. It is non-synchronised and not thread-safe, to make it thread safe wrap the set in Collections.synchronisedSet method.
+4. It doesn't maintain insertion order, to maintain insertion order use Linked Hash Set.
+5. It is preferred best for search operations.
+6. It's initial capacity is 16 by default and load factor is 0.75
+7. Internally HashSet uses HashMap to store elements. Each element in HashSet is stored as key in HashMap, with a dummy value associated with it.
+
+-> Add the elements at the end: set.add("Demon").
+-> Add one set to another set: set.addAll(set2).
+-> Remove an element from the end: set.remove("Demon").
+-> Remove all elements from the set: set.removeAll().
+-> Remove based on condition: set.removeIf(str -> str.contains("Demon")), uses lambda function.
+-> Remove all elements from array list, set.clear().
+-> Add a collection into HashSet, HashSet<String> set=new HashSet(list).
+
+Advantages:
+1. O(n) time complexity for adding, removing and checking if an element exists in the list.
+2. Quick lookups as it uses hashing technique.
+
+Disadvantages
+1. No insertion order.
+2. Hashset has higher memory overhead compared to some other data structures.
+3. It is not synchronised.
+
+LinkedHashSet
+`````````````
+1. LinkedHashSet class contains unique elements only like HashSet.
+2. LinkedHashSet class provides all optional set operations and permits null elements.
+3. LinkedHashSet class is non-synchronized.
+4. LinkedHashSet class maintains insertion order.
+
+Tree Set
+````````
+Tree Set uses binary search tree to store the elements in sorted manner. It takes O(lon(n)) time to add, search and remove the elements.
+1. Java tree set uses set interface that uses a tree for storage.
+2. Tree set access and retrieval are quite fast.
+3. Tree set doesn't allow null values.
+4. Tree set class is non-synchronised.
+5. Tree set maintains ascending order.
+6. It dynamically re-balances the structure during addition or removal of any element to ensure the elements are in ascending order.
+7. The sorting order of elements in tree set is natural and it can also be defined by a custom comparator.
+
+Note -> To make the set synchronised, use Collections.synchronizedSet(treeSet)
+Note -> Use tree set if required to retrieve ordered data quickly.
+
+Comparable
+``````````
+Java Comparable is used to order the objects of user defined class. It contains only one method, compareTo(Object).
+It is used to compare the current object with specified object.
+-> positive integer, if the current object is greater than the specified object.
+-> negative integer, if the current object is less than the specified object.
+-> zero, if the current object is equal to the specified object.
+
+eg:
+class Student implements Comparable<Student>{
+    int rollno;
+    String name;
+    int age;
+    Student(int rollno,String name,int age){
+        this.rollno=rollno;
+        this.name=name;
+        this.age=age;
+    }
+
+    public int compareTo(Student st){
+        if(age==st.age)
+        return 0;
+        else if(age>st.age)
+        return 1;
+        else
+        return -1;
+    }
+}
+
+Comparator
+``````````
+Java Comparator interface is used to order the objects of a user-defined class.
+This interface is found in java.util package and contains 2 methods compare(Object obj1,Object obj2) and equals(Object element).
+It's the same as Comparable almost
+for examples refer: https://www.tpointtech.com/java-comparator
+
+Comparable vs Comparator
+````````````````````````
+Comparable
+It defines natural ordering within a class.
+It is implemented inside the class being sorted.
+It uses the compareTo() method.
+It allows sorting by one one.
+Comparator
+It defines custom sorting logic
+It is implemented in a separate class or using lambda expressions.
+It uses the compare() method.
+It allows sorting by multiple criteria.
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,81 @@
+What is Java Memory model?
+``````````````````````````
+-> JMM defines how threads interact with memory in java.
+-> It is needed because modern compilers or CPUs may reorder the instructions and use caches, and one thread may see stale data written by another thread which can cause
+data inconsistency. JMM gives rules to write thread safe code.
+-> It defines order of operations between the threads. If A happens-before B, then B will see the effects of A.
+
+Java Memory Structure overview
+``````````````````````````````
+At runtime, JVM creates certain runtime data areas:
+1. Heap memory
+2. Stack memory
+3. Method Area (Implemented as Metaspace in Java 8+)
+4. Program Counter (PC) Register
+5. Native Method Stack
+
+Each area plays a unique role in executing Java programs and managing resources.
+
+1. HEAP MEMORY
+``````````````
+All class instances, arrays, and objects created during program execution are stored in Heap.
+Unlike stack memory, Heap is shared memory space and accessed by all the threads in JVM.
+It is automatically managed by Garbage collector, which reclaims the memory occupied by objects not in use.
+
+-> JVM divides the Heap memory in two parts:
+Young Generation and Old Generation.
+
+-> The Young Generation:
+    The Young generation is the space where newly created objects are placed. It is optimized for fast allocation and frequent garbage collection.
+    Because the majority of the objects are short lived(method local variables, temporary buffers), Minor Garbage Collectors are used which are fast and efficient.
+
+    Young generation internally divided into three spaces:
+     -> Eden: Initially all the objects are placed here, when Eden is filled up Minor GC is triggered.
+     -> Survivor Spaces (S0 and S1) : After Each Minor GC in Eden space, object are moved between S0 and S1.
+
+    As object survive for longer ages and if it crossed threshold (controlled by the JVM flag -XX:MaxTenuringThreshold), it is promoted to Old Generation Space. Promotion is also forced
+    when Survivor space is filled up.
+
+    Minor GCs are stop-the-world events, meaning all application threads are paused while this GC happens, and these pauses are minimal as the live data volume is small.
+
+-> The Old Generation:
+    It is designed to hold long lived objects, those who have survived multiple Minor GCs. In Old generation objects that used for extended period of time are stored, examples like:
+    - Persistent application-level caches
+    - Large object graphs such as sessions or user data
+    - Static or shared data structures that are retained across requests
+
+    Since objects in this space are used for longer ages, very less frequently GC happens and this GC is called as Major GC. And when both Generations are collected it is called as Major GC.
+
+    Collections in Old generation is very expensive and it involves:
+    - A full stop-the-world pause
+    - Tracing all reachable objects starting from the GC roots
+    - Compacting memory to eliminate fragmentation
+
+    Single threaded collection like Serial GC will take longer time where as parallel or concurrent collectors like Parallel GC, CMS or G1 reduce the time by using multiple threads.
+
+    If the old generation is full and if the GC is unable to reclaim the space, JVM will throw a java.lang.OutOfMemoryError: Java heap space.
+    example to set configurations of Heap memory:
+        command: -Xms512m -Xmx2g -Xmn512m -XX:NewRatio=3
+        This configuration sets an initial heap size of 512 MB, a maximum heap size of 2 GB, allocates 512 MB to the Young Generation,
+        and ensures the Old Generation is roughly three times larger than the Young Generation.
+
+2. STACK MEMORY
+```````````````
+Stack memory plays crucial role in method execution. Unlike Heap memory which stores objects for longer duration and shared across threads,
+Stack memory exists independently for each thread.
+When a thread is created, JVM allocates a new Java stack for that thread and it contains series of stack frames, each representing single method invocation.
+As methods are called and return, frames are pushed to and popped from the top of the stack in a strict last-in, first-out (LIFO) order.
+
+Everytime a method invoked, JVM allocates a new Frame on the thread's stack. This frame hold the necessary data of that invocation. The frame remains on the stack until the method
+either completes(returns) or exists abruptly and then frame is removed from the stack automatically; no GC required for stack memory.
+
+Stack frames are lightweight and quick to allocate, as they are thread-local and do not require synchronization, operations on stacks are extremely fast.
+
+Inside a Stack frame, the local variable array stores all the variable like primitive values(int, double, float), object references and Method parameters.
+Only references to objects are stored in stack, the actual object is stored in heap memory.
+
+Stack Size and Overflow:
+    Each thread stack is limited, and can be configured using -Xss JVM option. example:
+    command: -Xss1m, maximum stack size set to 1 mega bytes.
+    If stack exceeds the limit, StackOverFlow error gets thrown. And this happens during deep recursion with no base case, Method chaining or Improper termination condition in recursion.
+
