@@ -5,6 +5,11 @@ What is Java Memory model?
 data inconsistency. JMM gives rules to write thread safe code.
 -> It defines order of operations between the threads. If A happens-before B, then B will see the effects of A.
 
+Memory Leaks
+````````````
+To reclaim the space GC tries to remove the unused objects from the memory and sometimes it cannot remove the objects that are no longer required by application as it
+still has some active references. And this causes memory full and JVM throws OutOfMemoryError Exception.
+
 Java Memory Structure overview
 ``````````````````````````````
 At runtime, JVM creates certain runtime data areas:
@@ -78,4 +83,100 @@ Stack Size and Overflow:
     Each thread stack is limited, and can be configured using -Xss JVM option. example:
     command: -Xss1m, maximum stack size set to 1 mega bytes.
     If stack exceeds the limit, StackOverFlow error gets thrown. And this happens during deep recursion with no base case, Method chaining or Improper termination condition in recursion.
+
+3. Method Area Space
+````````````````````
+
+4. Program Counter (PC) register
+````````````````````````````````
+
+5. Native Method Stack
+``````````````````````
+
+Garbage Collection in  Java
+```````````````````````````
+-> Garbage Collection is Java's automatic memory management system.
+-> JVM automatically allocates memory for new objects in the heap, and as long as an object remains reachable through local variables,
+   static references, or other live objects, it stays alive.
+-> Once the object becomes unreachable, it becomes eligible for garbage collection.
+
+It Frees up memory occupied by unreachable objects.
+It Prevents memory leaks and heap exhaustion.
+It Ensures long-running applications continue to operate without manual intervention.
+
+Garbage collection algorithms in Java
+`````````````````````````````````````
+->  Serial garbage collection:
+    It uses single thread to perform garbage collection, pausing the application during each garbage collection. It's ideal for small application where pause times are
+    acceptable due to it's simplicity and low overhead.
+    It doesn't scale well in multi-core CPUs or large memory heaps due to it's long pause times.
+    Enable command: -XX:+UseSerialGC
+
+->  Parallel GC:
+    It uses multiple threads to perform garbage collection, which improves overall throughput by reducing time spent in GC.
+    It is designed for maximum CPU efficiency and throughput are more important than pause times.
+    However, since it still pauses the application during collection, it may not be ideal for latency-sensitive applications.
+    Enable with: -XX:+UseParallelGC
+
+->  G1 GC (Garbage First):
+    It is region based, low-pause collector designed to balance between throughput and pause time.
+    It incrementally collects small regions of the heap to avoid full GC pauses and provides tunable pause-time goals.
+    G1 became the default collector starting in Java 9 and is well-suited for server applications, microservices, and systems with moderate to large heaps.
+    It provides a good balance between performance and manageability, although tuning can be more complex than older collectors.
+    Enable with: -XX:+UseG1GC
+
+->  ZGC (Z Garbage Collector):
+    It is low latency GC introduce in Java 11, designed to keep pause times consistently below 10 milliseconds, even with heap sizes in the multi-terabyte range.
+    It achieves this by performing all heavy GC phases concurrently with the application.
+    Enable with: -XX:+UseZGC (stable since Java 15).
+
+->  Shenandoah:
+    Shenandoah is another modern low-pause collector, developed by Red Hat, which performs concurrent compaction, a feature ZGC lacks.
+    This makes it suitable for systems that require both low pause times and heap defragmentation.
+    Shenandoah is best suited for low-latency services such as databases, real-time systems, or interactive applications with strict response time requirements.
+    It can introduce slightly higher CPU overhead due to more frequent write barriers and increased GC activity.
+    Enable with: -XX:+UseShenandoahGC (production-ready in Java 15+)
+
+    Note: Memory compaction is a technique used in memory management to reduce fragmentation by reorganizing memory and combining scattered free spaces into a single, contiguous block.
+
+->  Garbage Collection Phases: Mark, Sweep, and Compact:
+    Mark: GC marks the reachable objects from the root.
+    Sweep: Once marking is done, all the unreachable objects are cleared.
+    Compact(optional): reduces fragmentation.
+
+->  Minor GC vs. Major GC vs. Full GC:
+    - Minor GC: A Minor GC collects the Young Generation only. It is frequent, fast, and typically involves copying live objects to survivor spaces or promoting them to the Old Generation.
+      Minor GCs are stop-the-world events but generally have short pause times.
+    - Major GC: A Major GC collects the Old Generation. It is less frequent and more expensive in terms of time and CPU usage.
+      These events are also stop-the-world and can lead to noticeable pauses if not managed well.
+    - Full GC: A Full GC collects the entire heap, including both Young and Old Generations. Depending on the collector and JVM version, it may also include Metaspace cleanup.
+      Full GCs are the most disruptive and should be avoided in latency-sensitive applications.
+
+->  Tuning Garbage Collection:
+    The performance and behavior of the JVM’s garbage collector can be tuned with a range of JVM options, allowing developers to optimize for throughput, pause time, or
+    memory footprint depending on their application’s needs.
+
+    # Heap size
+    -Xms512m -Xmx2g
+
+    # Young Generation size
+    -Xmn512m
+
+    # GC collector selection
+    -XX:+UseG1GC
+    -XX:+UseParallelGC
+    -XX:+UseZGC
+    -XX:+UseShenandoahGC
+
+    # GC logging
+    -Xlog:gc*:file=gc.log:time,uptime,level,tags
+
+    Monitoring tools like JFR, VisualVM, and jstat can help observe GC behavior and identify tuning opportunities.
+
+-> Ideal GCs:
+   Serial GC: Small apps, single-threaded or embedded systems and supports compaction. High pauses.
+   Parallel GC: Batch jobs, compute-heavy services, large heaps with loose latency requirements and supports compaction. Moderate-high pauses.
+   G1 GC: General-purpose apps, moderate-latency SLAs. Low-Moderate pauses.
+   ZGC: Real-time, large-heap, low-latency systems. Very low pauses.
+   Shenandoah: Interactive, real-time systems needing low pause and compaction. Very low pauses.
 

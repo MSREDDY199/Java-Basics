@@ -100,6 +100,44 @@ Tree Set uses binary search tree to store the elements in sorted manner. It take
 Note -> To make the set synchronised, use Collections.synchronizedSet(treeSet)
 Note -> Use tree set if required to retrieve ordered data quickly.
 
+HashMap
+```````
+-> It is not synchronised.
+-> It allows to store one null key and multiple null values.
+-> It doesn't maintain any insertion order.
+-> The initial default capacity of it is 16 and a load factor of 0.75.
+-> It offers constant time complexity to add or get elements.
+-> To iterate HashMap, entrySet(), keySet() or values() methods are used.
+-> The HashMap resizes by itself and rehashes the items to provide optimal performance.
+-> Load factor tells us when the hashmap should resize itself with the mentioned capacity.
+-> When two distinct keys have same hash, it stores them in the same bucket and preserve the entries using a linked list.
+-> A fail-fast iterator (like the one in HashMap) throws ConcurrentModificationException if the collection is structurally modified after the iterator is created,
+    except via the iterator’s own remove() method. This prevents inconsistent traversal results.
+
+Internal implementation:
+-> Hashing is a process of converting an object into integer value.
+
+-> equals(), it is used to compare the keys of the objects, whether they are equal or not.
+-> hashCode(), it returns the memory reference of the object in integer format which is nothing but a bucket number. The bucket number is the address of the element inside the map.
+-> Buckets, whenever a hashmap is created, it is created with array of 16 buckets(0-15) by default. Using hashcode() we have to calculate the right bucket number.
+
+Steps:
+1.  Whenever a put method is called, hashcode is calculated for the key which is nothing but a bucket number. Note that null keys are stored at 0th bucket.
+2.  Once the bucket number is calculated, it will use equals() method to check if the key is same or not, if yes it replaces and if not a linked list is maintained and gets attached to it.
+    After Java 8, if the linked list has more than 8 items, list is converted to balanced tree to improve loop-up speed.
+
+Note:
+Rehashing is when a HashMap doubles its bucket array and redistributes all entries into the new buckets based on their hash.
+Without resizing, too many keys would land in the same buckets → long linked lists/trees → poor performance (O(n)).
+Rehashing ensures average O(1) lookup time by preventing too many collisions.
+
+Concurrent Hashmap
+``````````````````
+ConcurrentHashMap internally divides its data into multiple segments (or buckets). Each segment acts like an independent HashMap and has its own lock.
+When a thread needs to perform a write operation (e.g., put, remove) on a specific key, it acquires the lock for the segment corresponding to that key.
+This allows other threads to simultaneously operate on different segments without blocking. Read operations generally do not require acquiring locks, further enhancing concurrency.
+It doesn't allow null items.
+
 Comparable
 ``````````
 Java Comparable is used to order the objects of user defined class. It contains only one method, compareTo(Object).
