@@ -1,5 +1,7 @@
 package Java_8_features;
 
+import TemporaryClasses.Customer;
+import TemporaryClasses.Employee;
 import TemporaryClasses.Product;
 
 import java.util.*;
@@ -135,6 +137,101 @@ public class Streams {
 
         // Flatmap transforms each element into a Stream, then flattens all those small streams into one big stream.
         List<String> characters = productsList.stream().map(product -> product.name.split("")).flatMap(Arrays::stream).distinct().toList();
+
+        // Interview questions
+        // filter() + map()
+        // 1. Given a list of strings, filter out empty strings.
+        List<String> words = Arrays.asList("apple", "", "banana", " ", "cherry", "", "date");
+        List<String> result = words.stream().filter(word -> !word.isEmpty()).toList();
+
+        // 2. Convert all strings in a list to uppercase except those starting with "a".
+        List<String> uppercase = words.stream().map(word -> word.startsWith("a") ? word : word.toUpperCase()).toList();
+
+        // 3. Find the distinct numbers from a list and sort them in ascending order.
+        List<Integer> numbers = Arrays.asList(2, 1, 8, 5, 1);
+        List<Integer> distinct = numbers.stream().distinct().sorted().toList();
+
+        // 4. Find the top 3 highest numbers in a list.
+        List<Integer> highest = numbers.stream().distinct().sorted(Comparator.reverseOrder()).limit(3).toList();
+
+        // 5. Find the 2nd smallest element in a list.
+        Optional<Integer> second = numbers.stream().distinct().sorted().skip(1).findFirst();
+
+        // 6. Find the sum of all integers in a list.
+        int sum = numbers.stream().reduce(0, Integer::sum);
+
+        // 7. Find the product of all integers in a list.
+        int product = numbers.stream().reduce(1, (a, b) -> a * b);
+
+        // 8. Find the longest string using reduce().
+        Optional<String> longest = words.stream().reduce((w1, w2) -> w1.length() >= w2.length() ? w1 : w2);
+
+        // 9. Find the employee with the highest salary using reduce().
+        List<Employee> employees = List.of(
+                new Employee("Alice", 60000),
+                new Employee("Bob", 45000),
+                new Employee("Charlie", 75000)
+        );
+        Optional<Employee> highestSalary = employees.stream().reduce((e1, e2) -> e1.getSalary() > e2.getSalary() ? e1 : e2);
+
+        // 10. Convert a list of strings to a Set.
+        Set<String> stringList = words.stream().collect(Collectors.toSet());
+
+        // 11. Convert a list of employees into a map of id -> name.
+        Map<String, Double> employeeList = employees.stream().collect(Collectors.toMap(Employee::getName, Employee::getSalary));
+
+        // 12. Find the frequency of words in a string.
+
+        // 13. Group employees by department.
+
+        // 14. Partition numbers into odd and even.
+
+        // 15. Join a list of strings into a single comma-separated string.
+
+        // 16. Find the minimum and maximum element in a list.
+        Optional<Integer> maximum = numbers.stream().max(Comparator.naturalOrder());
+        Optional<Integer> min = numbers.stream().min(Comparator.naturalOrder());
+
+        // 17. Find any element from a parallel stream.
+        Optional<Integer> randomNumber = numbers.parallelStream().findAny();
+
+        // 18. Count the number of strings longer than 5 characters.
+        long numStrings = words.stream().filter(word -> word.length() > 5).count();
+
+        // 19. Flatten a list of lists of integers into a single list.
+        List<List<Integer>> listOfLists = Arrays.asList(Arrays.asList(1, 2, 3), Arrays.asList(4, 5), Arrays.asList(6, 7, 8, 9));
+        List<Integer> intList = listOfLists.stream().flatMap(list -> list.stream()).toList();
+
+        // 20. From a list of sentences, extract all words into a list.
+        List<String> sentences = Arrays.asList("Java is fun", "Streams are powerful", "I love coding");
+        List<String> allWords = sentences.stream().flatMap(sentence -> Arrays.stream(sentence.split(" "))).toList();
+
+        // 21. Given a list of customers, each having multiple phone numbers, get all phone numbers.
+        List<Customer> customers = List.of(new Customer("Alice", List.of("123", "456")), new Customer("Bob", List.of("789")), new Customer("Charlie", List.of("101", "112")));
+        List<String> phoneNums = customers.stream().flatMap(customer -> customer.getPhoneNumbers().stream()).toList();
+
+        // 22. Find duplicate elements in a list.
+        Set<Integer> seen  = new HashSet<>();
+        Set<Integer> duplicates = numbers.stream().filter(num -> !seen.add(num)).collect(Collectors.toSet());
+
+        // 23. Find common elements between two lists.
+        List<Integer> list1 = Arrays.asList(1, 2, 3, 4, 5);
+        List<Integer> list2 = Arrays.asList(3, 4, 5, 6, 7);
+        Set<Integer> set1 = new HashSet<>(list1);
+        Set<Integer> common = list2.stream().filter(set1::contains).collect(Collectors.toSet());
+
+        // 24. Check if all elements in a list are even.
+        boolean match = numbers.stream().allMatch(num -> num % 2 == 0);
+
+        // 25. Remove null values from a list.
+        List<Integer> nonNull = numbers.stream().filter(Objects::nonNull).toList();
+
+        // 26. FInd the Kth largest element
+        int largest = numbers.stream().sorted(Comparator.reverseOrder()).skip(2).findFirst().orElse(-1);
+
+        // 27. Convert a list of objects to a CSV string.
+        // Collectors.joining(", ") → combines all elements into a single string with commas
+        String csv = employees.stream().map(Employee::getName).collect(Collectors.joining(", "));
 
     }
 }
