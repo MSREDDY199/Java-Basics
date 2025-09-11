@@ -183,6 +183,7 @@ public class Streams {
         // 12. Find the frequency of words in a string.
 
         // 13. Group employees by department.
+//        Map<String, List<Employee>> dept = employees.stream().collect(Collectors.groupingBy(Employee::getDepartment));
 
         // 14. Partition numbers into odd and even.
 
@@ -233,6 +234,66 @@ public class Streams {
         // Collectors.joining(", ") → combines all elements into a single string with commas
         String csv = employees.stream().map(Employee::getName).collect(Collectors.joining(", "));
 
+        List<Employee> employeesList = List.of(
+                new Employee("Alice", 60000, "Physics", 28),
+                new Employee("Bob", 45000, "Physics", 28),
+                new Employee("Charlie", 75000, "Maths", 29),
+                new Employee("David", 75000, "Maths", 31),
+                new Employee("Justin", 75000, "English", 30),
+                new Employee("Justin", 75000, "English", 30)
+        );
+
+        // Employee based questions
+        // 1. Sort employees by salary (descending)
+        List<Employee> desc_list = employeesList.stream().sorted(Comparator.comparingDouble(Employee::getSalary)).toList();
+
+        // 2. Sort by age, then by name
+        List<Employee> sort_age = employeesList.stream().sorted(Comparator.comparing(Employee::getAge).thenComparing(Employee::getName)).toList();
+
+        // Grouping with Streams
+        // 3. Group by age
+        Map<Integer, List<Employee>> group_age = employeesList.stream().collect(Collectors.groupingBy(Employee::getAge));
+
+        // 4. Group by age, count employees
+        Map<Integer, Long> group_age_count = employeesList.stream().collect(Collectors.groupingBy(Employee::getAge, Collectors.counting()));
+
+        // 5. Group by age, find max salary in each group
+        Map<Double, Optional<Employee>> group_age_max_salary = employeesList.stream().collect(Collectors.groupingBy(Employee::getSalary, Collectors.maxBy(Comparator.comparingDouble(Employee::getSalary))));
+
+        // 6. Find 2nd highest salary
+        Optional<Employee> sec_high_salary = employeesList.stream().sorted(Comparator.comparingDouble(Employee::getSalary).reversed()).skip(1).findFirst();
+
+        // 7. Get all names as a comma-separated string
+        String comma_sep_names = employeesList.stream().map(Employee::getName).collect(Collectors.joining(", "));
+
+        // 8. Partition employees into two groups: salary > 50k and <= 50k
+        Map<Boolean, List<Employee>> salary_employees = employeesList.stream().collect(Collectors.partitioningBy(emp -> emp.getSalary() > 50000));
+
+        // 9. Find the employee with max salary
+        Optional<Employee> max_salary_emp = employeesList.stream().max(Comparator.comparingDouble(Employee::getSalary));
+
+        // 10. Group by Age and Get Average Salary in Each Group
+        Map<Double, Double> age_avg_salary = employeesList.stream().collect(Collectors.groupingBy(Employee::getSalary, Collectors.averagingDouble(Employee::getSalary)));
+
+        // 11. Group by Age and List Names Only
+        Map<Integer, List<String>> name_list = employeesList.stream().collect(Collectors.groupingBy(Employee::getAge, Collectors.mapping(Employee::getName, Collectors.toList())));
+
+        // 12. Check if All Employees Have Salary > 30k
+        boolean all_emps_salary = employeesList.stream().allMatch(emp -> emp.getSalary() > 30000);
+
+        // 13. Check if Any Employee’s Name Starts with 'A'
+        boolean emp_with_A = employeesList.stream().anyMatch(emp -> emp.getName().startsWith("A"));
+
+        // 14. Find Oldest Employee
+        Optional<Employee> old_emp = employeesList.stream().max(Comparator.comparing(Employee::getAge));
+
+        // 15. Create Map of Name → Salary
+        Map<String, Double> name_salary_map = employeesList.stream().collect(Collectors.toMap(Employee::getName, Employee::getSalary));
+
+        // 16. Remove Duplicate Employees (based on name)
+        Set<String> emps = new HashSet<>(employeesList.stream().map(Employee::getName).toList());
+        List<Employee> duplicate_empls = employeesList.stream().filter(emp -> !emps.contains(emp.getName())).toList();
+        System.out.println(duplicate_empls);
     }
 }
 
